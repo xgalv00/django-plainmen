@@ -15,6 +15,7 @@
 {% block submit_buttons_bottom %}
     {{ block.super }}
 
+    {% if cl %}
     <div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
         {% block search %}{% search_form cl %}{% endblock %}
         {% block date_hierarchy %}{% date_hierarchy cl %}{% endblock %}
@@ -49,4 +50,5 @@
     <div class="submit-row">
         <a href="{% url 'admin:plainmenu_menuitem_add' original.pk %}" class="button">{% trans 'Add menu item' %}</a>
     </div>
+    {% endif %}
 {% endblock %}
