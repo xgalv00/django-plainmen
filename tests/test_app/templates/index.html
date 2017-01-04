@@ -1,0 +1,18 @@
+<html>
+{% load plainmenu %}
+<head>
+    <style type="text/css">
+        .menu {
+            background: rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>Menu test</h1>
+
+    {% for menu in menu_list %}
+    <h3>{{ menu.name }}</h3>
+    {% show_menu menu %}
+    {% endfor %}
+</body>
+</html>

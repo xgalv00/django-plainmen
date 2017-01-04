@@ -1,0 +1,12 @@
+syntax: glob
+venv
+*.pyc
+__pycache__
+*.sqlite3
+.coverage
+htmlcov
+.tox
+*.egg-info
+dist/
+build/
+docs/build/
