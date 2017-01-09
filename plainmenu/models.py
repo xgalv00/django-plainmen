@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from functools import wraps
+from collections import OrderedDict
 
 from treebeard.mp_tree import MP_Node, get_result_class, MP_ComplexAddMoveHandler
 
@@ -25,9 +26,18 @@ def _monkeypatch_treebeard():
     MP_ComplexAddMoveHandler.get_sql_update_numchild = new_numchild
 
 
+class Group(models.Model):
+    name = models.CharField(max_length=64)
+
+
+    def __str__(self):
+        return self.name
+
+
 class Menu(models.Model):
     identifier = models.CharField(max_length=16, unique=True)
     name = models.CharField(max_length=64)
+    group = models.ForeignKey(Group, null=True, blank=True)
 
 
     def __str__(self):
@@ -40,11 +50,18 @@ class Menu(models.Model):
 
 class MenuItem(MP_Node):
     node_order_by = ['sort_weight']
+    TARGET_NONE = 1
+    TARGET_BLANK = 2
+    TARGET_CHOICES = OrderedDict((
+        (TARGET_NONE, 'None'),
+        (TARGET_BLANK, 'New window'),
+    ))
 
     sort_weight = models.PositiveIntegerField()
     title = models.CharField(max_length=64)
     link = models.CharField(max_length=256, blank=True)
     menu = models.ForeignKey(Menu)
+    target = models.PositiveSmallIntegerField(choices=TARGET_CHOICES.items(), default=TARGET_NONE)
 
     class Meta:
         unique_together = (
@@ -62,6 +79,13 @@ class MenuItem(MP_Node):
             item.save()
 
         super(MenuItem, self).fix_tree(destructive)
+
+
+    def target_html(self):
+        if self.target == self.TARGET_NONE:
+            return ''
+        elif self.target == self.TARGET_BLANK:
+            return 'target="_blank"'
 
 
     @transaction.atomic

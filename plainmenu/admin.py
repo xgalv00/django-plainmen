@@ -11,7 +11,7 @@ from django.views.generic import RedirectView
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 
-from plainmenu.models import Menu, MenuItem
+from plainmenu.models import Menu, MenuItem, Group
 
 
 class MenuItemRedirectView(RedirectView):
@@ -27,12 +27,10 @@ class MenuItemRedirectView(RedirectView):
         return reverse('admin:{}'.format(self.name), args=reverse_args)
 
 
-
-#@admin.register(MenuItem)
 class MenuItemAdmin(TreeAdmin):
     exclude = ('path', 'depth', 'numchild', '_position')
     form = movenodeform_factory(MenuItem)
-    list_display = ('__str__', 'link')
+    list_display = ('__str__', 'link', 'link_target')
 
     def get_queryset(self, request):
         queryset = super(MenuItemAdmin, self).get_queryset(request)
@@ -41,6 +39,11 @@ class MenuItemAdmin(TreeAdmin):
             queryset = queryset.filter(menu__pk=request._current_tree_id)
 
         return queryset
+
+
+    @staticmethod
+    def link_target(obj):
+        return MenuItem.TARGET_CHOICES[obj.target]
 
 
     def changeform_view(self, request, menu_id=None, object_id=None, form_url=None, extra_context=None):
@@ -119,7 +122,9 @@ class MenuItemAdmin(TreeAdmin):
 @admin.register(Menu)
 class MenuAdmin(admin.ModelAdmin):
     change_form_template = 'admin/plainmenu/menu_change.html'
-    list_display = ('identifier', 'name')
+    list_display = ('identifier', 'name', 'group')
+    list_filter = ('group',)
+    ordering = ('group', 'identifier')
 
     def __init__(self, *args, **kwargs):
         super(self.__class__, self).__init__(*args, **kwargs)
@@ -176,3 +181,6 @@ class MenuAdmin(admin.ModelAdmin):
         cl.formset = None
 
         return cl
+
+
+admin.site.register(Group)
