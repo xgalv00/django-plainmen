@@ -161,6 +161,9 @@ class MenuAdmin(admin.ModelAdmin):
                     current_app=self.model_admin.admin_site.name
                 )
 
+            def get_filters(self, request):
+                return ([], False, {}, False)
+
         list_display = self.menu_admin.get_list_display(request)
 
         cl = MyChangeList(
