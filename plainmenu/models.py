@@ -35,7 +35,7 @@ class Group(models.Model):
 
 
 class Menu(models.Model):
-    identifier = models.CharField(max_length=16, unique=True)
+    identifier = models.CharField(max_length=32, unique=True)
     name = models.CharField(max_length=64)
     group = models.ForeignKey(Group, null=True, blank=True)
 
