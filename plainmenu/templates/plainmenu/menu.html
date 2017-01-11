@@ -3,7 +3,7 @@
 <li>
 {% if item.link %}<a href="{{ item.link }}" {{ item.target_html }}>{% endif %}{{ item.title }}{% if item.link %}</a>{% endif %}
 {% if item.get_children %}
-    {% include 'plainmenu/submenu.html' with items=item.get_children submenu=True only %}
+    {% include 'plainmenu/menu.html' with items=item.get_children submenu=True only %}
 {% endif %}
 {% endfor %}
 </ul>

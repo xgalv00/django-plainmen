@@ -35,9 +35,15 @@ class Group(models.Model):
 
 
 class Menu(models.Model):
-    identifier = models.CharField(max_length=32, unique=True)
+    identifier = models.CharField(max_length=32)
     name = models.CharField(max_length=64)
     group = models.ForeignKey(Group, null=True, blank=True)
+
+
+    class Meta:
+        unique_together = (
+            ('identifier', 'group'),
+        )
 
 
     def __str__(self):
