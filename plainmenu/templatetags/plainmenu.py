@@ -29,4 +29,6 @@ def show_menu(context, menu_name, group_name=None, **kwargs):
 
     context['items'] = menu.get_items() if menu else []
 
-    return template.loader.render_to_string(template_name, context.flatten(), context['request'])
+    return template.loader.render_to_string(
+        template_name, context.flatten(), request=context['request']
+    )
