@@ -18,7 +18,7 @@ setup(
     author='Kirill Stepanov',
     author_email='mail@kirillstepanov.me',
     packages=find_packages(),
-    download_url='https://bitbucket.org/impala/django-aboutconfig/get/%s.tar.gz' % VERSION_STRING,
+    download_url='https://bitbucket.org/impala/django-plainmenu/get/%s.tar.gz' % VERSION_STRING,
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Framework :: Django',
