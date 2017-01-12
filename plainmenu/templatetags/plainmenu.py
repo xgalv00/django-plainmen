@@ -32,3 +32,12 @@ def show_menu(context, menu_name, group_name=None, **kwargs):
     return template.loader.render_to_string(
         template_name, context.flatten(), request=context['request']
     )
+
+
+@register.inclusion_tag('admin/tree_change_list_results.html', takes_context=True)
+def result_tree_pm(context, cl, request):
+    from treebeard.templatetags.admin_tree import result_tree as orig
+
+    res = orig(context, cl, request)
+    res['filtered'] = False
+    return res
