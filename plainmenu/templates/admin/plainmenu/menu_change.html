@@ -13,9 +13,11 @@
 {% endblock %}
 
 {% block submit_buttons_bottom %}
-    {{ block.super }}
-
     {% if cl %}
+    <div class="submit-row">
+        <a href="{% url 'admin:plainmenu_menuitem_add' original.pk %}" class="button">{% trans 'Add menu item' %}</a>
+    </div>
+
     <div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
         {% block search %}{% search_form cl %}{% endblock %}
         {% block date_hierarchy %}{% date_hierarchy cl %}{% endblock %}
@@ -46,9 +48,7 @@
         {% block pagination %}{% pagination cl %}{% endblock %}
         </form>
     </div>
-
-    <div class="submit-row">
-        <a href="{% url 'admin:plainmenu_menuitem_add' original.pk %}" class="button">{% trans 'Add menu item' %}</a>
-    </div>
     {% endif %}
+
+    {{ block.super }}
 {% endblock %}

@@ -40,11 +40,17 @@ class MenuItemAdmin(TreeAdmin):
 
         return queryset
 
-
     @staticmethod
     def link_target(obj):
         return MenuItem.TARGET_CHOICES[obj.target]
 
+    def delete_view(self, request, menu_id, object_id, extra_context=None):
+        request._current_tree_id = menu_id
+        extra_context = extra_context or {}
+        extra_context['menu'] = get_object_or_404(Menu, pk=menu_id)
+        extra_context['menu_opts'] = Menu._meta
+
+        return super(MenuItemAdmin, self).delete_view(request, object_id, extra_context)
 
     def changeform_view(self, request, menu_id=None, object_id=None, form_url=None, extra_context=None):
         if object_id and not menu_id:
@@ -62,7 +68,6 @@ class MenuItemAdmin(TreeAdmin):
             form_url or '',
             extra_context
         )
-
 
     def get_form(self, request, obj=None, **kwargs):
         ModelForm = super(MenuItemAdmin, self).get_form(request, obj, **kwargs)
@@ -139,7 +144,8 @@ class MenuAdmin(admin.ModelAdmin):
             url(r'^.+/jsi18n/$', javascript_catalog, {'packages': ('treebeard',)}),
             url(r'^(\d+)/items/', include(self.menu_admin.get_urls())),
             url(r'^items/change/(.+)/', MenuItemRedirectView.as_view(name='plainmenu_menuitem_change'), name='plainmenu_menuitem_change'),
-            #url(r'^items/changelist/', MenuItemRedirectView.as_view(name='plainmenu_menu_changelist'), name='plainmenu_menuitem_changelist')
+            url(r'^items/delete/(.+)/', MenuItemRedirectView.as_view(name='plainmenu_menuitem_delete'), name='plainmenu_menuitem_delete'),
+            url(r'^items/changelist/', MenuItemRedirectView.as_view(name='plainmenu_menu_changelist'), name='plainmenu_menuitem_changelist')
         ] + super(MenuAdmin, self).get_urls()
 
     def change_view(self, request, object_id, form_url=u'', extra_context=None):
@@ -148,7 +154,6 @@ class MenuAdmin(admin.ModelAdmin):
         extra_context['cl'] = self.get_chagelist_instance(request)
 
         return super(MenuAdmin, self).change_view(request, object_id, form_url, extra_context)
-
 
     def get_chagelist_instance(self, request):
         ChangeList = self.menu_admin.get_changelist(request)
