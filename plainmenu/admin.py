@@ -1,6 +1,8 @@
 from treebeard.admin import TreeAdmin
 from treebeard.forms import movenodeform_factory
 
+import swapper
+
 from django import forms
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
@@ -11,7 +13,13 @@ from django.views.generic import RedirectView
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 
-from plainmenu.models import Menu, MenuItem, Group
+Menu = swapper.load_model('plainmenu', 'Menu')
+MenuItem = swapper.load_model('plainmenu', 'MenuItem')
+Group = swapper.load_model('plainmenu', 'Group')
+
+_menu_prefix = '{}_{}'.format(Menu._meta.app_label, Menu._meta.model_name)
+_menuitem_prefix = '{}_{}'.format(MenuItem._meta.app_label, MenuItem._meta.model_name)
+_group_prefix = '{}_{}'.format(Group._meta.app_label, Group._meta.model_name)
 
 
 class MenuItemRedirectView(RedirectView):
@@ -31,6 +39,8 @@ class MenuItemAdmin(TreeAdmin):
     exclude = ('path', 'depth', 'numchild', '_position')
     form = movenodeform_factory(MenuItem)
     list_display = ('__str__', 'link', 'link_target')
+    delete_confirmation_template = 'admin/plainmenu/menuitem/delete_confirmation.html'
+    change_form_template = 'admin/plainmenu/menuitem/change_form.html'
 
     def get_queryset(self, request):
         queryset = super(MenuItemAdmin, self).get_queryset(request)
@@ -143,15 +153,16 @@ class MenuAdmin(admin.ModelAdmin):
             url(r'^.+/move/$', self.admin_site.admin_view(self.menu_admin.move_node), ),
             url(r'^.+/jsi18n/$', javascript_catalog, {'packages': ('treebeard',)}),
             url(r'^(\d+)/items/', include(self.menu_admin.get_urls())),
-            url(r'^items/change/(.+)/', MenuItemRedirectView.as_view(name='plainmenu_menuitem_change'), name='plainmenu_menuitem_change'),
-            url(r'^items/delete/(.+)/', MenuItemRedirectView.as_view(name='plainmenu_menuitem_delete'), name='plainmenu_menuitem_delete'),
-            url(r'^items/changelist/', MenuItemRedirectView.as_view(name='plainmenu_menu_changelist'), name='plainmenu_menuitem_changelist')
+            url(r'^items/change/(.+)/', MenuItemRedirectView.as_view(name='%s_change' % _menuitem_prefix), name='%s_change' % _menuitem_prefix),
+            url(r'^items/delete/(.+)/', MenuItemRedirectView.as_view(name='%s_delete' % _menuitem_prefix), name='%s_delete' % _menuitem_prefix),
+            url(r'^items/changelist/', MenuItemRedirectView.as_view(name='%s_changelist' % _menu_prefix), name='%s_changelist' % _menuitem_prefix)
         ] + super(MenuAdmin, self).get_urls()
 
     def change_view(self, request, object_id, form_url=u'', extra_context=None):
         request._current_tree_id = object_id
         extra_context = extra_context or {}
         extra_context['cl'] = self.get_chagelist_instance(request)
+        extra_context['item_opts'] = MenuItem._meta
 
         return super(MenuAdmin, self).change_view(request, object_id, form_url, extra_context)
 

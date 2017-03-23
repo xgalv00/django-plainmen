@@ -5,6 +5,8 @@ from collections import OrderedDict
 
 from treebeard.mp_tree import MP_Node, get_result_class, MP_ComplexAddMoveHandler
 
+import swapper
+
 from django.db import models, transaction
 
 
@@ -26,21 +28,33 @@ def _monkeypatch_treebeard():
     MP_ComplexAddMoveHandler.get_sql_update_numchild = new_numchild
 
 
-class Group(models.Model):
+class AbstractGroup(models.Model):
     name = models.CharField(max_length=64, unique=True)
+
+
+    class Meta:
+        abstract = True
 
 
     def __str__(self):
         return self.name
 
 
-class Menu(models.Model):
+class Group(AbstractGroup):
+    class Meta:
+        swappable = swapper.swappable_setting('plainmenu', 'Group')
+
+
+class AbstractMenu(models.Model):
     identifier = models.CharField(max_length=32)
     name = models.CharField(max_length=64)
-    group = models.ForeignKey(Group, null=True, blank=True)
+    group = models.ForeignKey(
+        swapper.get_model_name('plainmenu', 'Group'), null=True, blank=True
+    )
 
 
     class Meta:
+        abstract = True
         unique_together = (
             ('identifier', 'group'),
         )
@@ -54,7 +68,12 @@ class Menu(models.Model):
         return self.menuitem_set.order_by(*MenuItem.node_order_by).filter(depth=1)
 
 
-class MenuItem(MP_Node):
+class Menu(AbstractMenu):
+    class Meta:
+        swappable = swapper.swappable_setting('plainmenu', 'Menu')
+
+
+class AbstractMenuItem(MP_Node):
     node_order_by = ['sort_weight']
     TARGET_NONE = 1
     TARGET_BLANK = 2
@@ -67,10 +86,11 @@ class MenuItem(MP_Node):
     title = models.CharField(max_length=64)
     hint = models.CharField(max_length=128, blank=True)
     link = models.CharField(max_length=256, blank=True)
-    menu = models.ForeignKey(Menu)
+    menu = models.ForeignKey(swapper.get_model_name('plainmenu', 'Menu'))
     target = models.PositiveSmallIntegerField(choices=TARGET_CHOICES.items(), default=TARGET_NONE)
 
     class Meta:
+        abstract = True
         unique_together = (
             ('path', 'menu'),
         )
@@ -85,7 +105,7 @@ class MenuItem(MP_Node):
             item.sort_order = i
             item.save()
 
-        super(MenuItem, self).fix_tree(destructive)
+        super(AbstractMenuItem, self).fix_tree(destructive)
 
 
     def target_html(self):
@@ -121,26 +141,26 @@ class MenuItem(MP_Node):
             self.sort_weight = last_child.sort_weight + 1 if last_child else 0
             self.save()
 
-        super(MenuItem, self).move(target, pos)
+        super(AbstractMenuItem, self).move(target, pos)
 
         if original_parent:
             original_parent.fix_tree()
 
 
     def get_sorted_pos_queryset(self, siblings, newobj):
-        return super(MenuItem, self).get_sorted_pos_queryset(siblings, newobj).filter(
+        return super(AbstractMenuItem, self).get_sorted_pos_queryset(siblings, newobj).filter(
             menu=self.menu
         )
 
 
     def get_children(self):
-        return super(MenuItem, self).get_children().filter(
+        return super(AbstractMenuItem, self).get_children().filter(
             menu=self.menu
         )
 
 
     def get_siblings(self):
-        return super(MenuItem, self).get_siblings().filter(
+        return super(AbstractMenuItem, self).get_siblings().filter(
             menu=self.menu
         )
 
@@ -168,6 +188,12 @@ class MenuItem(MP_Node):
         )
         return self._cached_parent_obj
 
-MenuItem._meta.get_field('path')._unique = False
+AbstractMenuItem._meta.get_field('path')._unique = False
+
+
+class MenuItem(AbstractMenuItem):
+    class Meta:
+        swappable = swapper.swappable_setting('plainmenu', 'MenuItem')
+
 
 _monkeypatch_treebeard()

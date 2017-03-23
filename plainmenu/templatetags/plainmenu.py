@@ -1,11 +1,13 @@
 from __future__ import absolute_import
 from django import template
+import swapper
 
 register = template.Library()
 
 @register.simple_tag(takes_context=True)
 def show_menu(context, menu_name, group_name=None, **kwargs):
-    from plainmenu.models import Menu, Group
+    Menu = swapper.load_model('plainmenu', 'Menu')
+    Group = swapper.load_model('plainmenu', 'Group')
 
     template_name = kwargs.get('template', 'plainmenu/menu.html')
 

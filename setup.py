@@ -40,6 +40,7 @@ setup(
     install_requires=[
         'django-treebeard<4.2',
         'FeinCMS<1.14'
+        'swapper<1.1'
     ],
     include_package_data=True,
     zip_safe=False,

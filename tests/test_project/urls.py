@@ -3,7 +3,9 @@ from django.contrib import admin
 from django.conf import settings
 from django.views.generic import ListView
 
-from plainmenu.models import Menu
+import swapper
+
+Menu = swapper.load_model('plainmenu', 'Menu')
 
 
 urlpatterns = [

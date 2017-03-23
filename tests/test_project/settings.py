@@ -69,3 +69,6 @@ USE_TZ = True
 INTERNAL_IPS = ('127.0.0.1',)
 
 STATIC_URL = '/static/'
+
+PLAINMENU_MENU_MODEL = 'test_app.Menu'
+PLAINMENU_MENUITEM_MODEL = 'test_app.MenuItem'
