@@ -8,6 +8,7 @@ from treebeard.mp_tree import MP_Node, get_result_class, MP_ComplexAddMoveHandle
 import swapper
 
 from django.db import models, transaction
+from django.utils.encoding import python_2_unicode_compatible
 
 
 def _monkeypatch_treebeard():
@@ -28,6 +29,7 @@ def _monkeypatch_treebeard():
     MP_ComplexAddMoveHandler.get_sql_update_numchild = new_numchild
 
 
+@python_2_unicode_compatible
 class AbstractGroup(models.Model):
     name = models.CharField(max_length=64, unique=True)
 
@@ -45,6 +47,7 @@ class Group(AbstractGroup):
         swappable = swapper.swappable_setting('plainmenu', 'Group')
 
 
+@python_2_unicode_compatible
 class AbstractMenu(models.Model):
     identifier = models.CharField(max_length=32)
     name = models.CharField(max_length=64)
@@ -73,6 +76,7 @@ class Menu(AbstractMenu):
         swappable = swapper.swappable_setting('plainmenu', 'Menu')
 
 
+@python_2_unicode_compatible
 class AbstractMenuItem(MP_Node):
     node_order_by = ['sort_weight']
     TARGET_NONE = 1
