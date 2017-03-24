@@ -83,7 +83,7 @@ class AbstractMenuItem(MP_Node):
     ))
 
     sort_weight = models.PositiveIntegerField()
-    title = models.CharField(max_length=64)
+    title = models.CharField(max_length=128)
     hint = models.CharField(max_length=128, blank=True)
     link = models.CharField(max_length=256, blank=True)
     menu = models.ForeignKey(swapper.get_model_name('plainmenu', 'Menu'))
