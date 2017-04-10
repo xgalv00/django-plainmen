@@ -18,12 +18,22 @@ def _monkeypatch_treebeard():
     @wraps(old_newpath)
     def new_newpath(self, *args, **kwargs):
         sql, vals = old_newpath(self, *args, **kwargs)
-        return sql + ' AND menu_id = %s', vals + [self.node.menu_id]
+
+        # only update sql for our model, ignore others (mp trees are also used by djangocms)
+        if self.node_cls == swapper.load_model('plainmenu', 'MenuItem'):
+            return sql + ' AND menu_id = %s', vals + [self.node.menu_id]
+        else:
+            return sql, vals
 
     @wraps(old_numchild)
     def new_numchild(self, *args, **kwargs):
         sql, vals = old_numchild(self, *args, **kwargs)
-        return sql + ' AND menu_id = %s', vals + [self.node.menu_id]
+
+        # only update sql for our model, ignore others (mp trees are also used by djangocms)
+        if self.node_cls == swapper.load_model('plainmenu', 'MenuItem'):
+            return sql + ' AND menu_id = %s', vals + [self.node.menu_id]
+        else:
+            return sql, vals
 
     MP_ComplexAddMoveHandler.get_sql_newpath_in_branches = new_newpath
     MP_ComplexAddMoveHandler.get_sql_update_numchild = new_numchild
