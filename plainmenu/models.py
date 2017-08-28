@@ -120,6 +120,10 @@ class AbstractMenuItem(MP_Node):
             item.save()
 
         super(AbstractMenuItem, self).fix_tree(destructive)
+        
+        for item in self.get_children():
+            item.numchild = item.get_children().count()
+            item.save()
 
 
     def target_html(self):
@@ -154,6 +158,10 @@ class AbstractMenuItem(MP_Node):
             last_child = target.get_last_child()
             self.sort_weight = last_child.sort_weight + 1 if last_child else 0
             self.save()
+            
+        if original_parent:
+            original_parent.fix_tree()
+            target.refresh_from_db()
 
         super(AbstractMenuItem, self).move(target, pos)
 
