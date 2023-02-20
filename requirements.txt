@@ -1,2 +1,2 @@
-django-treebeard==4.1.0
+django-treebeard==4.3
 FeinCMS==1.13.1
