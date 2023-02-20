@@ -38,7 +38,7 @@ setup(
         'Programming Language :: Python :: 3.5',
     ],
     install_requires=[
-        'django-treebeard<4.2',
+        'django-treebeard<=4.3',
         'FeinCMS<1.14',
         'swapper<1.1'
     ],
