@@ -100,7 +100,7 @@ class AbstractMenuItem(MP_Node):
     title = models.CharField(max_length=128)
     hint = models.CharField(max_length=128, blank=True)
     link = models.CharField(max_length=256, blank=True)
-    menu = models.ForeignKey(swapper.get_model_name('plainmenu', 'Menu'))
+    menu = models.ForeignKey(swapper.get_model_name('plainmenu', 'Menu'), on_delete=models.CASCADE)
     target = models.PositiveSmallIntegerField(choices=TARGET_CHOICES.items(), default=TARGET_NONE)
 
     class Meta:
