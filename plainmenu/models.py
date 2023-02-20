@@ -62,7 +62,7 @@ class AbstractMenu(models.Model):
     identifier = models.CharField(max_length=32)
     name = models.CharField(max_length=64)
     group = models.ForeignKey(
-        swapper.get_model_name('plainmenu', 'Group'), null=True, blank=True
+        swapper.get_model_name('plainmenu', 'Group'), null=True, blank=True, on_delete=models.SET_NULL
     )
 
 
