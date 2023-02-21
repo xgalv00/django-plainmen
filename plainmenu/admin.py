@@ -4,7 +4,7 @@ from treebeard.forms import movenodeform_factory
 import swapper
 
 from django import forms
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.contrib import admin
