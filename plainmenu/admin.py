@@ -152,7 +152,7 @@ class MenuAdmin(admin.ModelAdmin):
         return [
             url(r'^.+/move/$', self.admin_site.admin_view(self.menu_admin.move_node), ),
             url(r'^.+/jsi18n/$', JavaScriptCatalog.as_view(), {'packages': ('treebeard',)}),
-            url(r'^(\d+)/items/', self.menu_admin.get_urls()),
+            url(r'^(\d+)/items/', include(self.menu_admin.get_urls())),
             url(r'^items/change/(.+)/', MenuItemRedirectView.as_view(name='%s_change' % _menuitem_prefix), name='%s_change' % _menuitem_prefix),
             url(r'^items/delete/(.+)/', MenuItemRedirectView.as_view(name='%s_delete' % _menuitem_prefix), name='%s_delete' % _menuitem_prefix),
             url(r'^items/changelist/', MenuItemRedirectView.as_view(name='%s_changelist' % _menu_prefix), name='%s_changelist' % _menuitem_prefix)
