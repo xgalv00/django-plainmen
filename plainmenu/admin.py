@@ -181,6 +181,7 @@ class MenuAdmin(admin.ModelAdmin):
                 return ([], False, {}, False)
 
         list_display = self.menu_admin.get_list_display(request)
+        sortable_by = self.menu_admin.get_sortable_by(request)
 
         cl = MyChangeList(
             request,
@@ -195,6 +196,7 @@ class MenuAdmin(admin.ModelAdmin):
             self.menu_admin.list_max_show_all,
             self.menu_admin.list_editable,
             self.menu_admin,
+            sortable_by,
         )
 
         cl.formset = None
