@@ -178,7 +178,7 @@ class MenuAdmin(admin.ModelAdmin):
                 )
 
             def get_filters(self, request):
-                return ([], False, {}, False)
+                return ([], False, {}, False, False)
 
         list_display = self.menu_admin.get_list_display(request)
         sortable_by = self.menu_admin.get_sortable_by(request)
